@@ -11,7 +11,8 @@
     "heroku-postbuild": "npm run build",
     "install": "(cd beta-app && npm install --only=dev && npm install) ",
     "start": "node start-client.js",
-    "watch-css": "cd beta-app && npm run watch-css"
+    "start:prod": "node start-client.js",
+    "watch-css": "cd beta-app && npm run watch-css",
   },
   "repository": {
     "type": "git",
