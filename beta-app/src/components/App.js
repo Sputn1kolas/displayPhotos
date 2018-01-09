@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { CookiesProvider } from 'react-cookie';
 import { BrowserRouter } from 'react-router-dom'
 import Typist from 'react-typist';
 import logo from "../imgs/ATB_Logo.png";
