@@ -9,11 +9,9 @@
   "scripts": {
     "build": "cd beta-app/ && npm run build",
     "heroku-postbuild": "npm run build",
-    "install": "(cd beta-app && npm install --only=dev && npm install) && (cd server && npm install)",
+    "install": "(cd beta-app && npm install --only=dev && npm install) ",
     "start": "node start-client.js",
-    "start:prod": "cd server && npm run start:prod",
-    "watch-css": "cd beta-app && npm run watch-css",
-    "seed": "cd server && node dbFunctions.js seed"
+    "watch-css": "cd beta-app && npm run watch-css"
   },
   "repository": {
     "type": "git",
