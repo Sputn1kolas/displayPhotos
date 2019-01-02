@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'production') {
   server.use(express.static(build_path))
 }
 
-///////////////////////////////////// Databases init ////////////////////////////////////////////
+///////////////////////////////////// Databases Init ////////////////////////////////////////////
 
 server.get('/*', function(request, response) {
   console.log('Sending index.html file')
@@ -73,13 +73,11 @@ let writeCSV = function(rss_csv, feed){
 
 ///////////////////////////////////// Pull in feeds  ////////////////////////////////////////////
 // Creates a new parser object, that awaits all the feeds to come in
-let rss_csv = `title, isoDate, duration `
+let rss_csv = `title, isoDate, duration`
 let parser = new Parser();
 (async () => {
 
   let feed = await parser.parseURL('http://feeds.gimletmedia.com/hearreplyall');
-  console.log(feed.items[1])
-
   feed.items.forEach(item => {
     if(item.title[0] === "#"){
       // pulls in title, isoDate, duration: item.itunes.duration from the parsed rss and creates a csv
@@ -90,6 +88,12 @@ let parser = new Parser();
   writeCSV(rss_csv,feed)  
 })();
 
+///////////////////////////////////// Pass content to R  ////////////////////////////////////////////
+
+let R = require("r-script");
+let out = R("./ex-sync.R").data("hello world", 20).callSync();
+  
+console.log(out);
 
 
 

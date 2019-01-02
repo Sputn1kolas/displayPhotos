@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/Sputn1kolas/Beta-Alpha#readme",
   "dependencies": {
+    "r-script": "0.0.3",
     "react-typist": "^2.0.4",
     "rimraf": "^2.6.2"
   }
