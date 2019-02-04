@@ -38,62 +38,101 @@ if (process.env.NODE_ENV === 'production') {
   server.use(express.static(build_path))
 }
 
+///////////////////////////////////// Index For Images ////////////////////////////////////////////
+
+// server.get('/*', function(request, response) {
+//   console.log('Sending index.html file')
+//   console.log(request.query)
+//   response.sendFile(path.resolve(__dirname, build_path, 'index.html'))
+// });
+
+const dirname = "/Users/nikolasclark/Google Drive/Test Folder";
+const fs = require('fs');
+let photos = []
+let directories = []
+
+sortFiles = function(file, nestedDirectory = false){
+ if(file.slice(0,1) == "."){
+    return;  
+  } 
+  if(nestedDirectory){
+    file = `${nestedDirectory}/${file}`
+  }
+ if(file.slice(-4,-3) == "."){
+    photos.push(file)
+  } else {
+    directories.push(file)
+  }
+}
+sortDirectory = function(directory, nestedDirectory = false){
+  fs.readdirSync(directory).forEach(file => {
+    sortFiles(file, nestedDirectory)
+  })
+}
+sortDirectory(dirname)
+// while diretory.length != 0
+// loop through
+// find all files, and concatinate them with the directory
+// pop the directory item out 
+
+while (directories.length > 0) {
+  let directory = directories.pop()
+  let newPath = `${dirname}/${directory}`
+  sortDirectory(newPath, directory)
+  console.log(photos)
+  console.log(directories)
+}
+
+
+function generateRandomNumber(min_value , max_value) {
+  let random_number = Math.random() * (max_value - min_value) + min_value;
+  return Math.floor(random_number);
+}
+function randomElementInArray(array) {
+  return array[generateRandomNumber(0,array.length)];
+}
+
+console.log(randomElementInArray(photos));
+
 ///////////////////////////////////// Databases Init ////////////////////////////////////////////
 
-server.get('/*', function(request, response) {
-  console.log('Sending index.html file')
-  console.log(request.query)
-  response.sendFile(path.resolve(__dirname, build_path, 'index.html'))
-});
-
 server.listen(PORT, () => {
-  console.log(`Preventing Pandemics on ${ PORT }`)
+  console.log(`Sending neato photogs on ${ PORT }`)
+})
+
+server.get("/newPhoto1", (req, res) => {
+  console.log("trying to send a new one for ya!")
+  let fileName = randomElementInArray(photos)
+  let options  = {
+  root: dirname,//+ '/public/'
+      dotfiles: 'deny',
+      headers: {
+          'x-timestamp': Date.now(),
+          'x-sent': true
+      }
+    }
+
+  res.sendFile(fileName, options, function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('Sent:', fileName);
+      }
+    });
+})
+
+server.get("/newPhoto2", (req, res) => {
+  console.log("trying to send a new one for ya!")
+  response.sendFile("../../File1.jpg")
 })
 
 
-///////////////////////////////////// Create CSV  ////////////////////////////////////////////
-// let json2csv = require('json2csv');
+server.get("/newPhoto3", (req, res) => {
+  console.log("trying to send a new one for ya!")
+  response.sendFile("../../../File1.jpg")
+})
 
-// var fields = ['name', 'phone', 'mobile', 'email', 'address', 'notes'];
-// var fieldNames = ['Name', 'Phone', 'Mobile', 'Email', 'Address', 'Notes'];
-// var data = json2csv({ data: docs, fields: fields, fieldNames: fieldNames });
 
-// var jsoncsv = require('../json-csv')
-
-const fs = require('fs');
-
-let writeCSV = function(rss_csv, feed){
-  fs.writeFile("../hell.csv", rss_csv, function(err) {
-      if(err) {
-          return console.log(err);
-      }
-      console.log("The file was saved!");
-  }); 
-}
-
-///////////////////////////////////// Pull in feeds  ////////////////////////////////////////////
-// Creates a new parser object, that awaits all the feeds to come in
-let rss_csv = `title, isoDate, duration`
-let parser = new Parser();
-(async () => {
-
-  let feed = await parser.parseURL('http://feeds.gimletmedia.com/hearreplyall');
-  feed.items.forEach(item => {
-    if(item.title[0] === "#"){
-      // pulls in title, isoDate, duration: item.itunes.duration from the parsed rss and creates a csv
-      let new_line = `\n\"${item.title}\",${item.isoDate},${item.itunes.duration}`
-      rss_csv = rss_csv + new_line
-    }
-  });
-  writeCSV(rss_csv,feed)  
-})();
-
-///////////////////////////////////// Pass content to R  ////////////////////////////////////////////
-
-let R = require("r-script");
-let out = R("./ex-sync.R").data("hello world", 20).callSync();
-  
-console.log(out);
 
 
 

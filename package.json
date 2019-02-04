@@ -10,7 +10,7 @@
     "build": "cd beta-app/ && npm run build",
     "heroku-postbuild": "npm run build",
     "install": "(cd beta-app && npm install --only=dev && npm install) ",
-    "start": "node start-client.js",
+    "start": "concurrently \"node start-client.js\" \"cd server && npm start\"",
     "start:prod": "cd beta-app && npm start",
     "watch-css": "cd beta-app && npm run watch-css"
   },
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/Sputn1kolas/Beta-Alpha#readme",
   "dependencies": {
+    "concurrently": "^4.1.0",
     "r-script": "0.0.3",
     "react-typist": "^2.0.4",
     "rimraf": "^2.6.2"
