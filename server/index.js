@@ -40,6 +40,29 @@ if (process.env.NODE_ENV === 'production') {
 
 ///////////////////////////////////// Index For Images ////////////////////////////////////////////
 
+function copyFile(source, target) {
+  // var cbCalled = false;
+
+  var rd = fs.createReadStream(source);
+  rd.on("error", function(err) {
+  });
+  var wr = fs.createWriteStream(target);
+  wr.on("error", function(err) {
+  });
+  wr.on("close", function(ex) {
+  });
+  rd.pipe(wr);
+
+  // function done(err) {
+  //   if (!cbCalled) {
+  //     cb(err);
+  //     cbCalled = true;
+  //   }
+  //}
+}
+
+///////////////////////////////////// Index For Images ////////////////////////////////////////////
+
 // server.get('/*', function(request, response) {
 //   console.log('Sending index.html file')
 //   console.log(request.query)
@@ -47,6 +70,9 @@ if (process.env.NODE_ENV === 'production') {
 // });
 
 const dirname = "/Users/nikolasclark/Google Drive/Test Folder";
+let publicFolder = "/Users/nikolasclark/Development/photoView/beta-app/public"
+let newFilePath = `${publicFolder}/newPhoto.jpg`
+
 const fs = require('fs');
 let photos = []
 let directories = []
@@ -74,13 +100,10 @@ sortDirectory(dirname)
 // loop through
 // find all files, and concatinate them with the directory
 // pop the directory item out 
-
 while (directories.length > 0) {
   let directory = directories.pop()
   let newPath = `${dirname}/${directory}`
   sortDirectory(newPath, directory)
-  console.log(photos)
-  console.log(directories)
 }
 
 
@@ -92,7 +115,28 @@ function randomElementInArray(array) {
   return array[generateRandomNumber(0,array.length)];
 }
 
-console.log(randomElementInArray(photos));
+let deleteOldFile =  function(){
+   fs.access(newFilePath, error => {
+      if (!error) {
+          fs.unlinkSync(newFilePath);
+      } else {
+          console.log(error);
+      }
+  });
+  console.log("photo deleted")
+  return
+}
+
+let copyPhoto =  async function(repeat = false){
+  let oldFilePath = `${dirname}/${randomElementInArray(photos)}`
+  copyFile(oldFilePath, newFilePath)
+  if(repeat){
+    setTimeout(copyPhoto, 9000, true); // in MS 1000 = 1s
+  }
+  console.log("new photo for ya!")
+}
+
+copyPhoto(true)
 
 ///////////////////////////////////// Databases Init ////////////////////////////////////////////
 
@@ -100,38 +144,29 @@ server.listen(PORT, () => {
   console.log(`Sending neato photogs on ${ PORT }`)
 })
 
-server.get("/newPhoto1", (req, res) => {
-  console.log("trying to send a new one for ya!")
-  let fileName = randomElementInArray(photos)
-  let options  = {
-  root: dirname,//+ '/public/'
-      dotfiles: 'deny',
-      headers: {
-          'x-timestamp': Date.now(),
-          'x-sent': true
-      }
-    }
+server.get("/newPhoto", (req, res) => {
+//   console.log("trying to send a new one for ya!")
+  copyPhoto()
+//   res.json(result)
 
-  res.sendFile(fileName, options, function (err) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Sent:', fileName);
-      }
-    });
+//   // previously sent the photo directly. Did not work!
+//   // let fileName = randomElementInArray(photos)
+//   // let options  = {
+//   // root: dirname,//+ '/public/'
+//   //     dotfiles: 'deny',
+//   //     headers: {
+//   //         'x-timestamp': Date.now(),
+//   //         'x-sent': true
+//   //     }
+//   //   }
+//   // res.sendFile(fileName, options, function (err) {
+//   //     if (err) {
+//   //       console.log(err);
+//   //     } else {
+//   //       console.log('Sent:', fileName);
+//   //     }
+//   //   });
 })
-
-server.get("/newPhoto2", (req, res) => {
-  console.log("trying to send a new one for ya!")
-  response.sendFile("../../File1.jpg")
-})
-
-
-server.get("/newPhoto3", (req, res) => {
-  console.log("trying to send a new one for ya!")
-  response.sendFile("../../../File1.jpg")
-})
-
 
 
 

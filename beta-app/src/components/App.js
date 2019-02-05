@@ -2,17 +2,20 @@ import React, { Component } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import Typist from 'react-typist';
 import logo from "../imgs/ATB_Logo.png";
-
+import axios from 'axios'
+import ImageLoader from 'react-image-file';
 
 class App extends Component {
    constructor(props) {
     super(props)
     this.state = {
-      page: 1
+      page: 1,
+      seconds: 0
     }
   }
 
   slideFoward() {
+    this.getImage()
     let that = this
     console.log("slideFoward", this.state)
     if(this.state.page > 0) {
@@ -32,6 +35,7 @@ class App extends Component {
       })
     }
   }
+
 
   slide(page){
     switch(page){
@@ -67,13 +71,34 @@ class App extends Component {
     }
   }
 
+getImage() {
+    console.log("getting a new image")
+    //ajax get from db for new photo
+
+    const url =  `http://localhost:8080/newPhoto`
+
+    axios({
+      params:{
+      },
+      url: url
+    })
+    .then((response) => {
+      // let data = response.data
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+  
+
   render() {
     return (
-      <div>
-        {this.slide(this.state.page)}
-         <div className="next light_blue_font">
-          <div onClick={this.slideFoward.bind(this)} >Next</div>
+      <div >
+        <div className="next light_blue_font" onClick={() => {this.getImage()}} >
+          <div onClick={() => {this.getImage()}} >Next</div>
         </div>
+
+        <img src= {process.env.PUBLIC_URL + 'newPhoto.jpg'}/>
       </div>
     )
   }
