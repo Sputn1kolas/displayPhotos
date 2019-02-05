@@ -131,7 +131,7 @@ let copyPhoto =  async function(repeat = false){
   let oldFilePath = `${dirname}/${randomElementInArray(photos)}`
   copyFile(oldFilePath, newFilePath)
   if(repeat){
-    setTimeout(copyPhoto, 9000, true); // in MS 1000 = 1s
+    setTimeout(copyPhoto, 18000, true); // in MS 1000 = 1s
   }
   console.log("new photo for ya!")
 }

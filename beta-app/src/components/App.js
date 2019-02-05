@@ -97,8 +97,9 @@ getImage() {
         <div className="next light_blue_font" onClick={() => {this.getImage()}} >
           <div onClick={() => {this.getImage()}} >Next</div>
         </div>
-
-        <img src= {process.env.PUBLIC_URL + 'newPhoto.jpg'}/>
+        <div className="bg">
+          <img src= {process.env.PUBLIC_URL + 'newPhoto.jpg'} className="bg big_block"/>
+        </div>
       </div>
     )
   }
