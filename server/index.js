@@ -95,14 +95,15 @@ sortFiles = function(file, nestedDirectory = false){
   }
 }
 sortDirectory = function(directory, nestedDirectory = false){
-  fs.readdirSync(directory, function(err,file){
-    if(err){
-      console.log("error")
+  try {fs.readdirSync(directory).forEach(file => {
+    sortFiles(file, nestedDirectory)
+    })
+  catch(error) {
+    console.error(error);
+    // expected output: ReferenceError: nonExistentFunction is not defined
+    // Note - error messages will vary depending on browser
     }
   }
-    ).forEach(file => {
-    sortFiles(file, nestedDirectory)
-  })
 }
 sortDirectory(dirname)
 // while diretory.length != 0
