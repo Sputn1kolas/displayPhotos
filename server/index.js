@@ -69,8 +69,12 @@ function copyFile(source, target) {
 //   response.sendFile(path.resolve(__dirname, build_path, 'index.html'))
 // });
 
-const dirname = "/Users/nikolasclark/Google Drive/Test Folder";
-let publicFolder = "/Users/nikolasclark/Development/photoView/beta-app/public"
+// const dirname = "/Users/nikolasclark/Google Drive/Test Folder";
+// let publicFolder = "/Users/nikolasclark/Development/photoView/beta-app/public"
+
+const dirname =  "/media/pi/JAMCLARK/Nik/Pictures"
+let publicFolder = "/home/pi/Development/displayPhotos/beta-app/public"
+
 let newFilePath = `${publicFolder}/newPhoto.jpg`
 
 const fs = require('fs');
