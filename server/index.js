@@ -90,7 +90,7 @@ sortFiles = function(file, nestedDirectory = false){
   }
  if(file.slice(-5,-0) == ".jpeg" || file.slice(-5,-0) == ".png"){
     photos.push(file)
-  } else if(!file.includes(.)){
+  } else if(!file.includes(".")){
     directories.push(file)
   }
 }
