@@ -88,9 +88,9 @@ sortFiles = function(file, nestedDirectory = false){
   if(nestedDirectory){
     file = `${nestedDirectory}/${file}`
   }
- if(file.slice(-4,-3) == "." || file.slice(-5,-4) == "."){
+ if(file.slice(-5,-0) == ".jpeg" || file.slice(-5,-0) == ".png"){
     photos.push(file)
-  } else {
+  } else if(!file.includes(.)){
     directories.push(file)
   }
 }
