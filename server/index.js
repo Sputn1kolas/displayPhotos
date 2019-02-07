@@ -95,7 +95,12 @@ sortFiles = function(file, nestedDirectory = false){
   }
 }
 sortDirectory = function(directory, nestedDirectory = false){
-  fs.readdirSync(directory).forEach(file => {
+  fs.readdirSync(directory, function(err,file){
+    if(err){
+      console.log("error")
+    }
+  }
+    ).forEach(file => {
     sortFiles(file, nestedDirectory)
   })
 }
