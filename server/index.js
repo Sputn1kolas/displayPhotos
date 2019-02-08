@@ -88,8 +88,10 @@ sortFiles = function(file, nestedDirectory = false){
   if(nestedDirectory){
     file = `${nestedDirectory}/${file}`
   }
- if(file.slice(-5,-0) == ".jpeg" || file.slice(-5,-0) == ".png"){
+
+ if(file.includes(".jpeg") || file.includes(".png") || file.includes(".JPG")){
     photos.push(file)
+    console.log(photos.length)
   } else if(!file.includes(".")){
     directories.push(file)
   }
@@ -114,6 +116,7 @@ while (directories.length > 0) {
   let newPath = `${dirname}/${directory}`
   sortDirectory(newPath, directory)
 }
+
 
 
 function generateRandomNumber(min_value , max_value) {
@@ -145,7 +148,10 @@ let copyPhoto =  async function(repeat = false){
   console.log("new photo for ya!")
 }
 
-copyPhoto(true)
+if(directories.length == 0){
+ console.log("indexed")
+ copyPhoto(true)
+}
 
 ///////////////////////////////////// Databases Init ////////////////////////////////////////////
 
