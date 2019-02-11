@@ -37,10 +37,9 @@
     "express": "^4.16.4",
     "fs": "0.0.1-security",
     "json-csv": "^2.0.3",
-    "mongodb": "^2.2.31",
-    "monk": "^6.0.3",
     "r-script": "0.0.3",
-    "rss-parser": "^3.6.0"
+    "rss-parser": "^3.6.0",
+    "sharp": "^0.21.3"
   },
   "devDependencies": {
     "babel-register": "^6.26.0",

@@ -7,6 +7,8 @@ const server        = express()
 const router        = express.Router()
 const cors          = require('cors')
 const bodyParser    = require('body-parser')
+const sharp = require('sharp');
+
 //Parses RSS Feeds
 let Parser = require('rss-parser');
 
@@ -37,6 +39,18 @@ if (process.env.NODE_ENV === 'production') {
   build_path = file_path + 'beta-app/public'
   server.use(express.static(build_path))
 }
+
+///////////////////////////////////// Index For Images ////////////////////////////////////////////
+
+
+compress_images = function(input, output){
+  sharp(input)
+    .resize(1670, 1050)
+    .toFile(output, function(err) {
+      // output.jpg is a 300 pixels wide and 200 pixels high image
+      // containing a scaled and cropped version of input.jpg
+    });
+ }   
 
 ///////////////////////////////////// Index For Images ////////////////////////////////////////////
 
@@ -89,7 +103,8 @@ sortFiles = function(file, nestedDirectory = false){
     file = `${nestedDirectory}/${file}`
   }
 
- if(file.includes(".jpeg") || file.includes(".png") || file.includes(".JPG")){
+ file <- file.toLowerCase()
+ if(file.includes(".jpeg") || file.includes(".png") || file.includes(".jpg")){
     photos.push(file)
     console.log(photos.length)
   } else if(!file.includes(".")){
@@ -141,9 +156,9 @@ let deleteOldFile =  function(){
 
 let copyPhoto =  async function(repeat = false){
   let oldFilePath = `${dirname}/${randomElementInArray(photos)}`
-  copyFile(oldFilePath, newFilePath)
+  compress_images(oldFilePath, newFilePath)
   if(repeat){
-    setTimeout(copyPhoto, 18000, true); // in MS 1000 = 1s
+    setTimeout(copyPhoto, 180000, true); // in MS 1000 = 1s
   }
   console.log("new photo for ya!")
 }
@@ -182,6 +197,30 @@ server.get("/newPhoto", (req, res) => {
 //   //     }
 //   //   });
 })
+
+server.get("/sendPhoto", (req, res) => {
+
+//   res.json(result)
+
+//   // previously sent the photo directly. Did not work!
+  let fileName = randomElementInArray(photos)
+  let options  = {
+  root: dirname,//+ '/public/'
+      dotfiles: 'deny',
+      headers: {
+          'x-timestamp': Date.now(),
+          'x-sent': true
+      }
+    }
+  res.sendFile(fileName, options, function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('Sent:', fileName);
+      }
+    });
+})
+
 
 
 
