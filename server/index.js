@@ -86,8 +86,11 @@ function copyFile(source, target) {
 // const dirname = "/Users/nikolasclark/Google Drive/Test Folder";
 // let publicFolder = "/Users/nikolasclark/Development/photoView/beta-app/public"
 
-const dirname =  "/media/pi/JAMCLARK/Nik/Pictures"
-let publicFolder = "/home/pi/Development/displayPhotos/beta-app/public"
+//const dirname =  "/media/pi/JAMCLARK/Nik/Pictures"
+// let publicFolder = "/home/pi/Development/displayPhotos/beta-app/public"
+
+const dirname =   "D:/Nik/Pictures/Albums"
+let publicFolder = "C:/Users/Nik/Development/displayPhotos/beta-app/public"
 
 let newFilePath = `${publicFolder}/newPhoto.jpg`
 
@@ -103,7 +106,7 @@ sortFiles = function(file, nestedDirectory = false){
     file = `${nestedDirectory}/${file}`
   }
 
- file <- file.toLowerCase()
+ file = file.toLowerCase()
  if(file.includes(".jpeg") || file.includes(".png") || file.includes(".jpg")){
     photos.push(file)
     console.log(photos.length)
