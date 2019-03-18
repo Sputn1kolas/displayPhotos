@@ -71,12 +71,30 @@ class App extends Component {
     }
   }
 
-getImage() {
+  getImage() {
+      console.log("getting a new image")
+      //ajax get from db for new photo
+
+      const url =  `http://localhost:8080/newPhoto`
+
+      axios({
+        params:{
+        },
+        url: url
+      })
+      .then((response) => {
+        // let data = response.data
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+  
+
+  deleteImage(){
     console.log("getting a new image")
     //ajax get from db for new photo
-
-    const url =  `http://localhost:8080/newPhoto`
-
+    const url =  `http://localhost:8080/deletePhoto`
     axios({
       params:{
       },
@@ -89,7 +107,6 @@ getImage() {
       console.log(error)
     })
   }
-  
 
   render() {
     return (

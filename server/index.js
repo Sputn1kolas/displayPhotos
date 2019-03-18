@@ -1,3 +1,10 @@
+// Feature wishlist
+  // read metadata and set orientation
+  // delete photo -- done, cant access yet
+  // dont' show  photo (remove from index)
+  // save index 
+
+
 ///////////////////////////////////// Initiate ////////////////////////////////////////////
 
 const PORT          = process.env.PORT || 8080
@@ -45,9 +52,10 @@ if (process.env.NODE_ENV === 'production') {
 
 compress_images = function(input, output){
   sharp(input)
-    .resize(1670, 1050)
+    .resize(1670, 950)
     .toFile(output, function(err) {
-      // output.jpg is a 300 pixels wide and 200 pixels high image
+        console.log(err)
+      // output.jpg is a x pixels wide and x pixels high image
       // containing a scaled and cropped version of input.jpg
     });
  }   
@@ -90,6 +98,7 @@ function copyFile(source, target) {
 // let publicFolder = "/home/pi/Development/displayPhotos/beta-app/public"
 
 const dirname =   "D:/Nik/Pictures/Albums"
+const googleDirname =   "C:/Users/Nik/Google Drive/Google Photos"
 let publicFolder = "C:/Users/Nik/Development/displayPhotos/beta-app/public"
 
 let newFilePath = `${publicFolder}/newPhoto.jpg`
@@ -97,45 +106,51 @@ let newFilePath = `${publicFolder}/newPhoto.jpg`
 const fs = require('fs');
 let photos = []
 let directories = []
+let currentPhoto = ""
 
+//soft files concatinates the file name with the path, 
+
+isHiddenFile= function(file){
+  if(file.slice(0,1) == "."){
+    return(true);  
+  } 
+}
 sortFiles = function(file, nestedDirectory = false){
- if(file.slice(0,1) == "."){
+  file = file.toLowerCase()
+  file = `${nestedDirectory}/${file}`  
+  if(isHiddenFile(file)){
     return;  
   } 
-  if(nestedDirectory){
-    file = `${nestedDirectory}/${file}`
-  }
-
- file = file.toLowerCase()
  if(file.includes(".jpeg") || file.includes(".png") || file.includes(".jpg")){
     photos.push(file)
-    console.log(photos.length)
   } else if(!file.includes(".")){
     directories.push(file)
   }
 }
-sortDirectory = function(directory, nestedDirectory = false){
+sortDirectory = function(directory){
+  // for every file in the directory it calls sortfiles
+
   try {fs.readdirSync(directory).forEach(file => {
-    sortFiles(file, nestedDirectory)
-    })
+    sortFiles(file, directory)
+  })
   } catch(error) {
     console.error(error);
     // expected output: ReferenceError: nonExistentFunction is not defined
     // Note - error messages will vary depending on browser
   }
 }
-sortDirectory(dirname)
 // while diretory.length != 0
 // loop through
 // find all files, and concatinate them with the directory
 // pop the directory item out 
+
+sortDirectory(googleDirname)
+sortDirectory(dirname)
+
 while (directories.length > 0) {
-  let directory = directories.pop()
-  let newPath = `${dirname}/${directory}`
-  sortDirectory(newPath, directory)
-}
-
-
+  let poppedDirectory = directories.pop()
+  sortDirectory(poppedDirectory)
+} 
 
 function generateRandomNumber(min_value , max_value) {
   let random_number = Math.random() * (max_value - min_value) + min_value;
@@ -145,31 +160,41 @@ function randomElementInArray(array) {
   return array[generateRandomNumber(0,array.length)];
 }
 
-let deleteOldFile =  function(){
-   fs.access(newFilePath, error => {
+let deleteFile =  function(filePath){
+  fs.access(filePath, error => {
       if (!error) {
-          fs.unlinkSync(newFilePath);
+          fs.unlinkSync(filePath);
       } else {
           console.log(error);
       }
   });
   console.log("photo deleted")
+  copyPhoto()
   return
 }
 
 let copyPhoto =  async function(repeat = false){
-  let oldFilePath = `${dirname}/${randomElementInArray(photos)}`
-  compress_images(oldFilePath, newFilePath)
+  let randomPhoto = randomElementInArray(photos)
+  //change the current photo the selected photo
+  currentPhoto = randomPhoto
+  // let oldFilePath = `${dirname}/${newPhoto}`
+  let minutesDelay = 0.5
+  let delayInMs = minutesDelay*60*1000
+  compress_images(randomPhoto, newFilePath)
   if(repeat){
-    setTimeout(copyPhoto, 180000, true); // in MS 1000 = 1s
+    setTimeout(copyPhoto, delayInMs, true); // in MS 1000 = 1s
   }
-  console.log("new photo for ya!")
+  console.log(`new photo for ya!`)
+  console.log(currentPhoto)
 }
+
 
 if(directories.length == 0){
  console.log("indexed")
+ console.log(`There are ${photos.length} photos`)
  copyPhoto(true)
 }
+
 
 ///////////////////////////////////// Databases Init ////////////////////////////////////////////
 
@@ -178,27 +203,13 @@ server.listen(PORT, () => {
 })
 
 server.get("/newPhoto", (req, res) => {
-//   console.log("trying to send a new one for ya!")
+  console.log("trying to send a new one for ya!")
   copyPhoto()
-//   res.json(result)
+})
 
-//   // previously sent the photo directly. Did not work!
-//   // let fileName = randomElementInArray(photos)
-//   // let options  = {
-//   // root: dirname,//+ '/public/'
-//   //     dotfiles: 'deny',
-//   //     headers: {
-//   //         'x-timestamp': Date.now(),
-//   //         'x-sent': true
-//   //     }
-//   //   }
-//   // res.sendFile(fileName, options, function (err) {
-//   //     if (err) {
-//   //       console.log(err);
-//   //     } else {
-//   //       console.log('Sent:', fileName);
-//   //     }
-//   //   });
+server.get("/deletePhoto", (req, res) => {
+  console.log("gonna delete this bitchhh!")
+  deleteFile(currentPhoto)
 })
 
 server.get("/sendPhoto", (req, res) => {
