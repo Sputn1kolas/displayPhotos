@@ -64,7 +64,6 @@ compress_images = function(input, output){
 
 function copyFile(source, target) {
   // var cbCalled = false;
-
   var rd = fs.createReadStream(source);
   rd.on("error", function(err) {
   });
@@ -97,8 +96,9 @@ function copyFile(source, target) {
 //const dirname =  "/media/pi/JAMCLARK/Nik/Pictures"
 // let publicFolder = "/home/pi/Development/displayPhotos/beta-app/public"
 
-const dirname =   "D:/Nik/Pictures/Albums"
-const googleDirname =   "C:/Users/Nik/Google Drive/Google Photos"
+// const dirname =   "D:/Nik/Pictures/Albums"
+const dirname = "C:/Users/Nik/Pictures/Saved Pictures"
+// const googleDirname =   "C:/Users/Nik/Google Drive/Google Photos"
 let publicFolder = "C:/Users/Nik/Development/displayPhotos/beta-app/public"
 
 let newFilePath = `${publicFolder}/newPhoto.jpg`
@@ -107,6 +107,7 @@ const fs = require('fs');
 let photos = []
 let directories = []
 let currentPhoto = ""
+let currentPhotoNumber = 0
 
 //soft files concatinates the file name with the path, 
 
@@ -129,7 +130,6 @@ sortFiles = function(file, nestedDirectory = false){
 }
 sortDirectory = function(directory){
   // for every file in the directory it calls sortfiles
-
   try {fs.readdirSync(directory).forEach(file => {
     sortFiles(file, directory)
   })
@@ -144,7 +144,7 @@ sortDirectory = function(directory){
 // find all files, and concatinate them with the directory
 // pop the directory item out 
 
-sortDirectory(googleDirname)
+// sortDirectory(googleDirname)
 sortDirectory(dirname)
 
 while (directories.length > 0) {
@@ -154,23 +154,27 @@ while (directories.length > 0) {
 
 function generateRandomNumber(min_value , max_value) {
   let random_number = Math.random() * (max_value - min_value) + min_value;
+  currentPhotoNumber = random_number
   return Math.floor(random_number);
 }
 function randomElementInArray(array) {
   return array[generateRandomNumber(0,array.length)];
 }
 
-let deleteFile =  function(filePath){
-  fs.access(filePath, error => {
-      if (!error) {
-          fs.unlinkSync(filePath);
-      } else {
-          console.log(error);
-      }
-  });
-  console.log("photo deleted")
+let deleteFile =  function(path){
+    fs.unlink(path, (err) => {
+    if (err) {
+      console.error(err)
+      return
+    }
+  })
   copyPhoto()
-  return
+}
+
+let dontShowFile =  function(path){
+  photos.splice(currentPhotoNumber, 1)
+  console.log("photo wont show")
+  copyPhoto()
 }
 
 let copyPhoto =  async function(repeat = false){
@@ -178,7 +182,7 @@ let copyPhoto =  async function(repeat = false){
   //change the current photo the selected photo
   currentPhoto = randomPhoto
   // let oldFilePath = `${dirname}/${newPhoto}`
-  let minutesDelay = 0.5
+  let minutesDelay = 15
   let delayInMs = minutesDelay*60*1000
   compress_images(randomPhoto, newFilePath)
   if(repeat){
@@ -209,13 +213,12 @@ server.get("/newPhoto", (req, res) => {
 
 server.get("/deletePhoto", (req, res) => {
   console.log("gonna delete this bitchhh!")
-  deleteFile(currentPhoto)
+  dontShowFile("doesnt Matter")
+  // deleteFile(currentPhoto)
 })
 
-server.get("/sendPhoto", (req, res) => {
-
+server.get(`/sendPhoto`, (req, res) => {
 //   res.json(result)
-
 //   // previously sent the photo directly. Did not work!
   let fileName = randomElementInArray(photos)
   let options  = {

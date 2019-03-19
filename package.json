@@ -10,7 +10,7 @@
     "build": "cd beta-app/ && npm run build",
     "heroku-postbuild": "npm run build",
     "install": "(cd beta-app && npm install --only=dev && npm install) ",
-    "start": "concurrently \"node start-client.js\" \"cd server && npm start\"",
+    "start": "concurrently \"cd beta-app && npm start\" \"cd server && npm start\"",
     "start:prod": "cd beta-app && npm start",
     "watch-css": "cd beta-app && npm run watch-css"
   },

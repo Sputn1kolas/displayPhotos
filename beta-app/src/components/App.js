@@ -10,8 +10,32 @@ class App extends Component {
     super(props)
     this.state = {
       page: 1,
-      seconds: 0
+      time: null
     }
+  }
+
+  componentDidMount() {
+    setInterval( () => {
+      this.setState({
+        time : this.getTime(), 
+      })
+    }, 1000)
+  }
+
+  getTime(){
+    let time = new Date()
+    let hour  = time.getHours()
+    let minutes = time.getMinutes()
+    let AMPM = "AM"
+    if( hour > 12 ){
+      hour = hour - 12
+      AMPM = "PM"
+    } 
+    if(minutes < 10){
+      minutes = `0${minutes}`
+    }
+    time = `${hour}:${minutes}`
+    return(time)
   }
 
   slideFoward() {
@@ -89,19 +113,20 @@ class App extends Component {
         console.log(error)
       })
   }
-  
 
   deleteImage(){
-    console.log("getting a new image")
+    console.log("DELETING")
     //ajax get from db for new photo
-    const url =  `http://localhost:8080/deletePhoto`
+    const url =  `//localhost:8080/deletePhoto`
     axios({
       params:{
       },
-      url: url
+      url: url,
+      method: 'get'
     })
     .then((response) => {
       // let data = response.data
+      this.getImage()
     })
     .catch((error) => {
       console.log(error)
@@ -112,6 +137,10 @@ class App extends Component {
     return (
       <div >
         <div className="bg">
+          <div className="overlay">
+            <p> {this.state.time} </p>
+          </div>
+          <div onClick={this.deleteImage.bind(this)}>DELETE</div>
           <img src= {process.env.PUBLIC_URL + 'newPhoto.jpg'} className="bg big_block"/>
         </div>
       </div>
