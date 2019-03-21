@@ -1,3 +1,24 @@
+.panal{
+  opacity:0.1;
+  position: fixed;
+  top: 95%;
+  font-size: 15px;
+}
+
+.right{
+    left: 85%;
+}
+
+.left{
+    right: 85%;
+}
+
+.panal:hover{
+  opacity: 0.5;
+  color: white;
+}
+
+
 .overlay{
   position: fixed;
   display: flex;

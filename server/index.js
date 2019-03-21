@@ -20,6 +20,8 @@ const sharp = require('sharp');
 let Parser = require('rss-parser');
 
 
+
+
 // Make the express server serve static assets (html, javascript, css) from the /public folder
 server.use(bodyParser.urlencoded({ extended: true }))
 server.use(bodyParser.json())
@@ -106,10 +108,63 @@ let newFilePath = `${publicFolder}/newPhoto.jpg`
 const fs = require('fs');
 let photos = []
 let directories = []
+let dontShowThesePhotos = []
 let currentPhoto = ""
 let currentPhotoNumber = 0
 
+
+let photoDB = {
+  // filename:{
+  //   "fileName": ""
+  //   "path": "",
+  //   "timesViewed":,
+  //   "canShow": True,
+  //   "orientation": "Horizontal"
+  // }
+}
+
 //soft files concatinates the file name with the path, 
+loadFile = function(){
+  let path =  `./json/photoDB.json`
+  try {
+    if (fs.existsSync(path)) {
+      fs.readFile( path, function (err, data) {
+        if (err) {
+          throw err; 
+        }
+        console.log("Loaaaaded the JSON")
+        photoDB = JSON.parse(data)
+      });
+    }
+  } catch(err) {
+    console.error(err)
+  }
+  
+}
+loadFile()
+
+let getFileName = function(file){
+  string = file.split("/").pop()
+  return(string)
+}
+
+
+// error is photo.db is not  a function!
+loadInDb = function(file){
+  if(file in photoDB){
+    return
+  } else {
+    let fileName = getFileName(file)
+    photoDB[fileName] = {
+      "fileName": fileName,
+      "path": file,
+      "timesViewed": 0,
+      "canShow": true,
+      "orientation": "Horizontal",
+      "deleteMe": false
+    }
+  }
+}
 
 isHiddenFile= function(file){
   if(file.slice(0,1) == "."){
@@ -124,6 +179,7 @@ sortFiles = function(file, nestedDirectory = false){
   } 
  if(file.includes(".jpeg") || file.includes(".png") || file.includes(".jpg")){
     photos.push(file)
+    loadInDb(file)
   } else if(!file.includes(".")){
     directories.push(file)
   }
@@ -168,17 +224,46 @@ let deleteFile =  function(path){
       return
     }
   })
+  let fileName = getFileName(path)
+  photoDB[fileName].deleteMe = true
   copyPhoto()
 }
 
+let saveFile = function(file){
+  var jsonData = JSON.stringify(file, null, 2);
+  fs.writeFile(`./json/photoDB.json`, jsonData, function(err) {
+    if(err) {
+      console.error(err)
+      return
+    }  
+  })
+}
+
+
 let dontShowFile =  function(path){
-  photos.splice(currentPhotoNumber, 1)
+  let currentPhotoName = currentPhoto
+  let fileName = getFileName(currentPhotoName)
+  console.log(`saving the photo ${currentPhotoName} ${fileName}`)
+  photoDB[fileName].canShow = false
+  // dontShowThesePhotos.push(currentPhotoName)
+  saveFile(photoDB)
   console.log("photo wont show")
   copyPhoto()
 }
 
-let copyPhoto =  async function(repeat = false){
+let newPhoto = function(){
   let randomPhoto = randomElementInArray(photos)
+  canShow = photoDB[getFileName(randomPhoto)].canShow
+  console.log(canShow)
+  if(canShow){
+    return(randomPhoto)
+  } else {
+    return(newPhoto())
+  }
+}
+
+let copyPhoto =  async function(repeat = false){
+  let randomPhoto = newPhoto()
   //change the current photo the selected photo
   currentPhoto = randomPhoto
   // let oldFilePath = `${dirname}/${newPhoto}`
@@ -196,6 +281,7 @@ let copyPhoto =  async function(repeat = false){
 if(directories.length == 0){
  console.log("indexed")
  console.log(`There are ${photos.length} photos`)
+ console.log(photoDB)
  copyPhoto(true)
 }
 
@@ -213,9 +299,14 @@ server.get("/newPhoto", (req, res) => {
 
 server.get("/deletePhoto", (req, res) => {
   console.log("gonna delete this bitchhh!")
-  dontShowFile("doesnt Matter")
-  // deleteFile(currentPhoto)
+  deleteFile(currentPhoto)
 })
+
+server.get("/dontShowPhoto", (req, res) => {
+  console.log("not gonna show  this bitchhh!")
+  dontShowFile("doesnt Matter")
+})
+
 
 server.get(`/sendPhoto`, (req, res) => {
 //   res.json(result)

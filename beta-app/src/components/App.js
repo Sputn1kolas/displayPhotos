@@ -133,6 +133,25 @@ class App extends Component {
     })
   }
 
+  dontShowPhoto(){
+    console.log("DELETING")
+    //ajax get from db for new photo
+    const url =  `//localhost:8080/dontShowPhoto`
+    axios({
+      params:{
+      },
+      url: url,
+      method: 'get'
+    })
+    .then((response) => {
+      // let data = response.data
+      this.getImage()
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
   render() {
     return (
       <div >
@@ -140,7 +159,9 @@ class App extends Component {
           <div className="overlay">
             <p> {this.state.time} </p>
           </div>
-          <div onClick={this.deleteImage.bind(this)}>DELETE</div>
+          <div className="panal right" onClick={this.dontShowPhoto.bind(this)}>NoShow</div>
+          <div className="panal left"  onClick={this.deleteImage.bind(this)}>Delete</div>
+
           <img src= {process.env.PUBLIC_URL + 'newPhoto.jpg'} className="bg big_block"/>
         </div>
       </div>
